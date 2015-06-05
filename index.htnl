@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Is This HO Host Online?</title>
+  <script>
+function checkHostStatus(
+    btn
+) {
+
+    var divID = btn.parentNode.id
+    var url = "http://" + document.getElementById(
+        divID).getElementsByTagName('input')[0].value.replace(
+        'https://', '').replace(
+        'http://', '').replace(
+        ':11775/', '').replace(
+        ':11775', '').replace(
+        ':', '').replace(
+        '/', '') + ":11775/"
+
+    function getValues(
+        obj, key
+    ) {
+        var objects = [];
+        for (
+            var i in obj
+        ) {
+            if (!obj.hasOwnProperty(i)) continue;
+            if (
+                typeof obj[i] == 'object'
+            ) {
+                objects = objects.concat(
+                    getValues(obj[i], key)
+                );
+            } else if (
+                i == key
+            ) {
+                objects.push(
+                    obj[i]
+                );
+            }
+        }
+        return objects;
+    }
+
+    var script = document.body.appendChild(
+        document.createElement(
+            "script"
+        )
+    );
+    script.onload = function() {
+        if (
+            window.XMLHttpRequest
+        ) xmlhttp = new XMLHttpRequest();
+        else xmlhttp = new ActiveXObject(
+            "Microsoft.XMLHTTP"
+        );
+        xmlhttp.open(
+            "GET", url, false
+        );
+        xmlhttp.send();
+        var json = JSON.parse(
+            xmlhttp.responseText
+        );
+        var capitalized = json.variantType.charAt(
+            0
+        ).toUpperCase() + json.variantType.substring(
+            1
+        );
+
+        var info = json.hostPlayer + " is hosting " + capitalized +
+            "\n" + json.variant + " On " + json.map +
+            "\nThere is currently " + json.numPlayers +
+            " of " + json.maxPlayers + " players in this game" +
+            "\n" + getValues(json.players, 'name') +
+            "\n\nUse Server.Connect " + url.split('/')[2].split(':')[0] +
+            " to join" + "\nThis game is hosted at " + url +
+            "\n\nYou need ElDewrito v" + json.eldewritoVersion +
+            " in order to play on this server\n";
+
+        var output = info.split(
+            "\n"
+        ).join(
+            "<br />"
+        );
+        document.getElementById(
+            divID
+        ).getElementsByTagName(
+            'p'
+        )[0].innerHTML = output;
+        console.clear();
+        console.log(
+            "\n" + info
+        );
+        //alert(info);
+    };
+    script.onerror = function() {
+        console.log(
+            "There is no one hosting on " + url
+        );
+        document.getElementById(
+                divID
+            ).getElementsByTagName(
+                'p'
+            )[0].innerHTML =
+            "There is no one hosting on " + url;
+    };
+    //script.src = url;
+}
+</script>
+</head>
+<body>
+  <div id="host1">
+Enter Host IP: <input type="text">
+    <button onclick="checkHostStatus(this)">Get Info</button>
+    <p></p>
+  </div>
+ 
+ 
+</body>
+</html>
